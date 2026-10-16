@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metrospect ROI action plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5F4; --surface:#FFFFFF; --ink:#18252D; --muted:#5A6B75; --line:#D8DEE1;
+  --steel:#2E4A5C; --amber:#D99A00; --amber-soft:#FFF4D6; --done:#2F7D4F; --done-soft:#E3F2E8;
+  --client:#7A4E9C; --client-soft:#F1E9F7; --you-soft:#E4EDF3;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121A1F; --surface:#1A252C; --ink:#E6ECEF; --muted:#9AAAB3; --line:#2C3A42;
+    --steel:#8FB3C9; --amber:#F2B630; --amber-soft:#3A2F12; --done:#5CC388; --done-soft:#1C3527;
+    --client:#C7A0E6; --client-soft:#2E2338; --you-soft:#1F3341;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121A1F; --surface:#1A252C; --ink:#E6ECEF; --muted:#9AAAB3; --line:#2C3A42;
+  --steel:#8FB3C9; --amber:#F2B630; --amber-soft:#3A2F12; --done:#5CC388; --done-soft:#1C3527;
+  --client:#C7A0E6; --client-soft:#2E2338; --you-soft:#1F3341;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:2.5rem 1.25rem 4rem}
+h1,h2{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:700;letter-spacing:.01em;line-height:1.05;margin:0}
+h1{font-size:clamp(2.4rem,7vw,3.6rem)}
+.lede{color:var(--muted);max-width:62ch;margin:.75rem 0 0}
+.meter{margin:2rem 0 1rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1.1rem 1.25rem}
+.meter-top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+.meter-num{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:2.2rem;line-height:1}
+.meter-num small{font-size:1rem;color:var(--muted);font-family:"Public Sans",sans-serif;font-weight:500;margin-left:.35rem}
+.bar{height:10px;background:var(--line);border-radius:5px;margin-top:.8rem;overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--done);transition:width .35s ease}
+.controls{display:flex;gap:.5rem 1rem;flex-wrap:wrap;align-items:center;margin:1.25rem 0 .5rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:.9rem;padding:.45rem .8rem;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--steel);color:var(--surface)}
+.reset{margin-left:auto;font:inherit;font-size:.85rem;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:.4rem}
+button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+.phase{margin-top:2.75rem}
+.phase-head{display:grid;grid-template-columns:auto 1fr auto;gap:0 .9rem;align-items:center;border-bottom:2px solid var(--ink);padding-bottom:.6rem}
+.phase-no{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:1rem;width:2.1rem;height:2.1rem;border-radius:50%;background:var(--amber);color:#1b1400;display:grid;place-items:center}
+.phase h2{font-size:1.85rem}
+.phase-when{color:var(--muted);font-size:.92rem;grid-column:2}
+.phase-count{font-size:.9rem;color:var(--muted);grid-row:1/3;grid-column:3;text-align:right;white-space:nowrap}
+
+.task{display:grid;grid-template-columns:auto 1fr;gap:.2rem .9rem;padding:1.1rem 0;border-bottom:1px solid var(--line)}
+.task input{appearance:none;-webkit-appearance:none;width:1.45rem;height:1.45rem;border:2px solid var(--steel);border-radius:5px;margin:.15rem 0 0;cursor:pointer;display:grid;place-items:center;background:var(--surface)}
+.task input:checked{background:var(--done);border-color:var(--done)}
+.task input:checked::after{content:"";width:.42rem;height:.75rem;border:solid var(--surface);border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.task label{font-weight:600;cursor:pointer;font-size:1.05rem}
+.task.is-done label{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.task .body{grid-column:2}
+.task p{margin:.25rem 0 0;color:var(--muted);max-width:68ch}
+.task .doneWhen{color:var(--ink);font-size:.93rem}
+.task .doneWhen b{font-weight:600}
+.tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.55rem}
+.tag{font-size:.78rem;padding:.12rem .55rem;border-radius:4px;font-weight:500}
+.t-you{background:var(--you-soft);color:var(--steel)}
+.t-client{background:var(--client-soft);color:var(--client)}
+.t-both{background:var(--line);color:var(--ink)}
+.t-high{background:var(--amber-soft);color:var(--ink);border:1px solid var(--amber)}
+.t-med{border:1px solid var(--line);color:var(--muted)}
+.t-effort{color:var(--muted);padding-left:.1rem}
+.hidden{display:none}
+.empty{color:var(--muted);padding:1rem 0;font-size:.95rem}
+.note{margin-top:3rem;font-size:.9rem;color:var(--muted);border-left:3px solid var(--amber);padding-left:1rem}
+@media (max-width:540px){
+  .phase-head{grid-template-columns:auto 1fr}
+  .phase-count{grid-row:auto;grid-column:2;text-align:left}
+  .reset{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){.bar span{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Metrospect ROI action plan</h1>
+  <p class="lede">Stop the lead leaks first, then lift conversion, then grow referrals and repeat work. Tick tasks off as you go; your progress is saved in this browser.</p>
+
+  <section class="meter" aria-live="polite">
+    <div class="meter-top">
+      <div class="meter-num" id="pct">0%<small>complete</small></div>
+      <div id="countText" style="color:var(--muted);font-size:.95rem">0 of 0 tasks done</div>
+    </div>
+    <div class="bar"><span id="barFill"></span></div>
+  </section>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Show tasks by status">
+      <button data-status="all" aria-pressed="true">All</button>
+      <button data-status="open" aria-pressed="false">Open</button>
+      <button data-status="done" aria-pressed="false">Done</button>
+    </div>
+    <div class="seg" role="group" aria-label="Show tasks by owner">
+      <button data-owner="all" aria-pressed="true">Everyone</button>
+      <button data-owner="you" aria-pressed="false">You</button>
+      <button data-owner="client" aria-pressed="false">Client</button>
+    </div>
+    <button class="reset" id="reset">Clear all ticks</button>
+  </div>
+
+  <div id="phases"></div>
+
+  <p class="note">Assumptions: you're the agency or marketer managing Metrospect's website and Google Ads, so "You" covers web and ads work and "Client" covers decisions only the business can make (pricing, phone numbers, partnerships). Timeframes assume a few hours a week. Adjust owners and dates to suit.</p>
+</main>
+
+<script>
+const PLAN = [
+  { title:"Stop the leaks", when:"This week", tasks:[
+    {id:"t1", t:"Fix the header phone link on every page", why:"The header shows 0418 330 387 but dials 1800 008 240. Point every tel: link to tel:0418330387 (or whichever number the client confirms).", done:"Tapping the number on iPhone and Android rings the right line from every page template.", owner:"you", impact:"high", effort:"15 min"},
+    {id:"t2", t:"Fix the broken call link on the cost page", why:"It's written as http://+1800 008 240, so tapping it opens nothing.", done:"Link uses tel: format and works on mobile.", owner:"you", impact:"high", effort:"5 min"},
+    {id:"t3", t:"Confirm which phone numbers are live", why:"The 1800 number still appears in old directory listings. Decide on one primary number and whether to forward the other.", done:"One primary number agreed, and old listings updated or forwarded.", owner:"client", impact:"high", effort:"30 min"},
+    {id:"t4", t:"Set up call and form conversion tracking", why:"Without it, ad spend can't be tied to bookings. Add Google Ads call conversions, a tel: click event in GA4 and a form thank-you conversion.", done:"Test call and test form both show as conversions in Google Ads.", owner:"you", impact:"high", effort:"2 hrs"},
+    {id:"t5", t:"Pull a 90-day baseline", why:"Needed to measure ROI later: ad spend, clicks, calls, form leads, bookings and average job value.", done:"Cost per booking and lead-to-booking rate written down.", owner:"both", impact:"high", effort:"1 hr"},
+    {id:"t6", t:"Remove or relink the social icons", why:"They point to Facebook and LinkedIn login pages and the defunct Google+.", done:"Icons link to real profiles, or are removed.", owner:"you", impact:"med", effort:"15 min"},
+    {id:"t7", t:"Clean up text errors", why:"Stray 'Archicentre' in an FAQ heading, a duplicated testimonial, 'Tanya' typo, and 35 vs 40 years of experience on different pages.", done:"One consistent experience figure site-wide and no visible typos.", owner:"you", impact:"med", effort:"30 min"}
+  ]},
+  { title:"Convert more visitors", when:"Weeks 2–4", tasks:[
+    {id:"t8", t:"Publish 'from' pricing on the cost page", why:"The page ranks for price searches but tells people to call. Show starting prices by property type.", done:"Price grid live (units, 3-bed, 4-bed+, add-ons).", owner:"client", impact:"high", effort:"1 hr"},
+    {id:"t9", t:"Add a downloadable sample report", why:"One of the strongest trust signals in this industry, and it shows off the 20+ page photo reports.", done:"Redacted sample PDF linked from the homepage and cost page.", owner:"both", impact:"high", effort:"2 hrs"},
+    {id:"t10", t:"Rewrite the homepage hero around real differentiators", why:"Thermal imaging, same-day verbal report, next-day written report, licensed inspectors, HIA membership and 20+ years are buried in testimonials.", done:"Above the fold shows differentiators, price-from, and call and book buttons.", owner:"you", impact:"high", effort:"4 hrs"},
+    {id:"t11", t:"Trim testimonials to the best five", why:"25+ undated testimonials make the page a wall of text. Keep the strongest, link to the full page.", done:"Homepage shows five testimonials with suburb names.", owner:"you", impact:"med", effort:"1 hr"},
+    {id:"t12", t:"Add online booking with card payment", why:"Currently it's enquire, wait for a quote, then call in card details. Urgent pre-auction buyers go to whoever confirms first.", done:"Customer can pick a slot and pay online. Interim option: a payment link in the invoice email.", owner:"both", impact:"high", effort:"1–2 days"},
+    {id:"t13", t:"Add a sticky call button on mobile", why:"Most searchers are on phones and want to call immediately.", done:"Call button stays visible while scrolling on mobile.", owner:"you", impact:"med", effort:"1 hr"},
+    {id:"t14", t:"Start a Google review routine", why:"Top4 shows zero reviews and the 10 Oneflare reviews are gone. Happy customers already email thanks; send them a review link instead.", done:"Review link in every report email. Target 50 Google reviews in 90 days.", owner:"client", impact:"high", effort:"30 min setup"},
+    {id:"t15", t:"Optimise the Google Business Profile", why:"Drives Maps rankings for 'building inspection near me'.", done:"Categories, service areas, hours, real inspection photos and a monthly post in place.", owner:"you", impact:"high", effort:"2 hrs"}
+  ]},
+  { title:"Grow referrals and repeat work", when:"Months 2–3", tasks:[
+    {id:"t16", t:"Build regional landing pages", why:"The site claims Geelong, Yarra Valley, the Peninsula and the Dandenongs but has no pages for them.", done:"Five location pages live with local detail, pricing and a booking form.", owner:"you", impact:"med", effort:"1–2 days"},
+    {id:"t17", t:"Launch an agent and conveyancer referral program", why:"Testimonials repeatedly mention impressed agents. Turn that into a steady lead source that doesn't depend on ads.", done:"30 local agencies and conveyancers contacted with a one-pager, and referrals tracked.", owner:"client", impact:"high", effort:"Ongoing"},
+    {id:"t18", t:"Offer annual termite inspections to past clients", why:"Pre-purchase work is one-off; an annual check creates recurring revenue.", done:"12-month reminder email set up for every completed inspection.", owner:"both", impact:"med", effort:"3 hrs"},
+    {id:"t19", t:"Add a second-inspection discount", why:"Buyers who miss out at auction need another inspection soon and may shop around.", done:"Offer mentioned in every report email.", owner:"client", impact:"med", effort:"30 min"},
+    {id:"t20", t:"Promote pre-sale and dilapidation reports", why:"Pre-sale suits vendors via agents; dilapidation reports bring repeat B2B work from builders.", done:"Updated service pages, plus outreach to 15 local builders.", owner:"both", impact:"med", effort:"1 day"},
+    {id:"t21", t:"Run a monthly ROI review", why:"Compare against the baseline so spend goes to what's working.", done:"Monthly check of cost per booking, booking rate, review count and rankings.", owner:"both", impact:"high", effort:"1 hr / month"}
+  ]}
+];
+
+const KEY = "metrospect-roi-checklist-v1";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e){ state = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} };
+
+let statusFilter = "all", ownerFilter = "all";
+const ownerLabel = {you:"You", client:"Client", both:"You + client"};
+const ownerClass = {you:"t-you", client:"t-client", both:"t-both"};
+
+function render(){
+  const root = document.getElementById("phases");
+  root.innerHTML = "";
+  PLAN.forEach((ph, i) => {
+    const sec = document.createElement("section");
+    sec.className = "phase";
+    const doneN = ph.tasks.filter(t => state[t.id]).length;
+    sec.innerHTML = `<div class="phase-head">
+        <div class="phase-no" aria-hidden="true">${i+1}</div>
+        <h2>${ph.title}</h2>
+        <div class="phase-when">${ph.when}</div>
+        <div class="phase-count">${doneN} / ${ph.tasks.length} done</div>
+      </div>`;
+    let shown = 0;
+    ph.tasks.forEach(t => {
+      const isDone = !!state[t.id];
+      const okStatus = statusFilter === "all" || (statusFilter === "done") === isDone;
+      const okOwner = ownerFilter === "all" || t.owner === ownerFilter || t.owner === "both";
+      if (!okStatus || !okOwner) return;
+      shown++;
+      const row = document.createElement("div");
+      row.className = "task" + (isDone ? " is-done" : "");
+      row.innerHTML = `<input type="checkbox" id="${t.id}" ${isDone ? "checked" : ""}>
+        <div class="body">
+          <label for="${t.id}">${t.t}</label>
+          <p>${t.why}</p>
+          <p class="doneWhen"><b>Done when:</b> ${t.done}</p>
+          <div class="tags">
+            <span class="tag ${ownerClass[t.owner]}">${ownerLabel[t.owner]}</span>
+            <span class="tag ${t.impact === "high" ? "t-high" : "t-med"}">${t.impact === "high" ? "High impact" : "Medium impact"}</span>
+            <span class="tag t-effort">${t.effort}</span>
+          </div>
+        </div>`;
+      row.querySelector("input").addEventListener("change", e => {
+        if (e.target.checked) state[t.id] = true; else delete state[t.id];
+        save(); render();
+        const el = document.getElementById(t.id); if (el) el.focus();
+      });
+      sec.appendChild(row);
+    });
+    if (!shown) {
+      const e = document.createElement("p");
+      e.className = "empty";
+      e.textContent = statusFilter === "done" ? "Nothing ticked off here yet." : "No tasks match these filters.";
+      sec.appendChild(e);
+    }
+    root.appendChild(sec);
+  });
+  const all = PLAN.flatMap(p => p.tasks);
+  const d = all.filter(t => state[t.id]).length;
+  const pct = Math.round(d / all.length * 100);
+  document.getElementById("pct").innerHTML = `${pct}%<small>complete</small>`;
+  document.getElementById("countText").textContent = `${d} of ${all.length} tasks done`;
+  document.getElementById("barFill").style.width = pct + "%";
+}
+
+document.querySelectorAll("[data-status]").forEach(b => b.addEventListener("click", () => {
+  statusFilter = b.dataset.status;
+  document.querySelectorAll("[data-status]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  render();
+}));
+document.querySelectorAll("[data-owner]").forEach(b => b.addEventListener("click", () => {
+  ownerFilter = b.dataset.owner;
+  document.querySelectorAll("[data-owner]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  render();
+}));
+document.getElementById("reset").addEventListener("click", () => {
+  if (confirm("Clear all ticks?")) { state = {}; save(); render(); }
+});
+render();
+</script>
+</body>
+</html>
